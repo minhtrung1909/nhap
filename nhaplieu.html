@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nhập dữ liệu vào Google Sheet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Nhập thông tin khách hàng</h2>
+  <form id="dataForm">
+    <label>Họ tên:</label>
+    <input type="text" name="hoten" required>
+
+    <label>Số điện thoại:</label>
+    <input type="text" name="sdt" required>
+
+    <label>Email:</label>
+    <input type="email" name="email">
+
+    <label>Ghi chú:</label>
+    <textarea name="ghichu" rows="3"></textarea>
+
+    <button type="submit">Gửi dữ liệu</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    document.getElementById('dataForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = {
+        hoten: form.hoten.value,
+        sdt: form.sdt.value,
+        email: form.email.value,
+        ghichu: form.ghichu.value
+      };
+
+      document.getElementById('status').innerText = "Đang gửi...";
+
+      fetch("https://script.google.com/macros/s/AKfycbziY_i-h452BUCYEF6Y42l_mrb8c5j33XiAn1rqe9JUR4Y-QzUD5IgIdZ2usMkkcIkn1w/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(response => response.text())
+      .then(text => {
+        if (text === "OK") {
+          document.getElementById('status').innerText = "✅ Đã gửi thành công!";
+          form.reset();
+        } else {
+          document.getElementById('status').innerText = "⚠️ Có lỗi xảy ra: " + text;
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        document.getElementById('status').innerText = "❌ Không thể gửi dữ liệu!";
+      });
+    });
+  </script>
+
+</body>
+</html>
